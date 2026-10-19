@@ -12,10 +12,6 @@ classDiagram
         
     }
     
-    class HealthMonitor {
-        
-    }
-    
     class Incident {
         
     }
@@ -45,7 +41,6 @@ classDiagram
     }
     
     %% Relationships
-    HealthMonitor "1"-->"0..*" Service
     Service "1"-->"0..*" Incident
     Incident "1"--*"0..1" IncidentReport
     Incident "1"--*"1..*" IncidentEvent
