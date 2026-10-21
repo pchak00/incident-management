@@ -14,7 +14,7 @@ classDiagram
         -int checkIntervalSeconds
         
         +changeUrl(String serviceUrl) void
-        +recordSucessfullCheck() void
+        +recordSuccessfulCheck() void
         +recordFailedCheck() void
         +activateService() void
         +deactivateService() void
