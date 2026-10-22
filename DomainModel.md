@@ -13,7 +13,9 @@ classDiagram
         -int consecutiveFailures
         -int checkIntervalSeconds
         
+        +rename(String serviceName) void
         +changeUrl(String serviceUrl) void
+        +changeCheckInterval(int checkIntervalSeconds) void
         +recordSuccessfulCheck() void
         +recordFailedCheck() void
         +activateService() void
@@ -35,8 +37,8 @@ classDiagram
         -Long id
         -Engineer leadEngineerAssigned
         -Engineer acknowledgedBy
-        -LocalDateTime createdAt
-        -LocalDateTime resolvedAt
+        -Instant createdAt
+        -Instant resolvedAt
         -Service serviceAffected
         -String incidentDescription
         -List ~IncidentEvent~ activityTimeline
@@ -46,14 +48,16 @@ classDiagram
         +addEvent(IncidentEvent event) void
         +acknowledgeIncident(Engineer engineer) void
         +assignEngineer(Engineer engineer) void
+        +recordServiceRecovery() void
+        +recordServiceOutage() void
         +attachReport(IncidentReport report) void
-        +resolve() void
+        +resolve(Engineer engineer) void
     }
     
     class IncidentReport {
         -Long id
-        -LocalTimeDate createdAt
-        -LocalTimeDate updatedAt
+        -Instant createdAt
+        -Instant updatedAt
         -String report
         -Incident createdFrom
         -Engineer createdBy
@@ -66,7 +70,7 @@ classDiagram
         -IncidentEventType eventType
         -Incident incidentFrom
         -Engineer performedBy
-        -LocalDateTime createdAt
+        -Instant createdAt
         -String eventDescription
     }
     
@@ -74,8 +78,9 @@ classDiagram
         <<enumeration>>
         CREATED,
         ACKNOWLEDGED,
-        LEAD_ASSIGNED
+        LEAD_ASSIGNED,
         SERVICE_RECOVERED,
+        SERVICE_UNHEALTHY,
         RESOLVED
     }
     
@@ -102,12 +107,13 @@ classDiagram
     }
     
     %% Relationships
-    Service "1"-->"0..*" Incident
-    Incident "1"--*"0..1" IncidentReport
-    Incident "1"--*"1..*" IncidentEvent
-    Incident "1"-->"1" Engineer
-    Engineer "1"<--"1" IncidentEvent
-    Engineer "1"<--"1" IncidentReport
+    Service "1" --> "0..*" Incident : affected service
+    Incident "1" *-- "0..1" IncidentReport : optional postmortem
+    Incident "1" *-- "1..*" IncidentEvent : activity timeline
+    Incident "0..*" --> "0..1" Engineer : acknowledged by
+    Incident "0..*" --> "0..1" Engineer : assigned lead
+    IncidentEvent "0..*" --> "0..1" Engineer : performed by
+    IncidentReport "0..*" --> "1" Engineer : authored by
     EngineerRole -- Engineer
     IncidentStatusType -- Incident
     HealthStatus -- Service
